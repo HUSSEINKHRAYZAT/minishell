@@ -6,7 +6,7 @@
 /*   By: hkhrayza <hkhrayza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 11:50:09 by hkhrayza          #+#    #+#             */
-/*   Updated: 2025/01/17 11:54:00 by hkhrayza         ###   ########.fr       */
+/*   Updated: 2025/01/24 20:46:30 by hkhrayza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,20 +59,27 @@ void	handle_redirection_token(t_lexer **lexer, char *line, int *i)
 	}
 }
 
-void	handle_quotes(t_lexer **lexer, char *line, int *i,
-		t_quote_type quote_type, int flag_space)
+char	determinequote(t_quote_type quote_ctx)
 {
-	char	*token_start;
-	char	end_quote;
-	int		j;
+	if (quote_ctx == SINGLE_QUOTES)
+		return ('\'');
+	else if (quote_ctx == DOUBLE_QUOTES)
+		return ('\"');
+	return (0);
+}
+
+int	handle_quotes(t_lexer **lexer, char *line, int *i,
+		t_quote_context quote_ctx)
+{
+	char			*token_start;
+	char			end_quote;
+	int				j;
+	t_process_data	data;
 
 	token_start = &line[*i];
 	j = 0;
 	(*i)++;
-	if (quote_type == SINGLE_QUOTES)
-		end_quote = '\'';
-	else
-		end_quote = '\"';
+	end_quote = determinequote(quote_ctx.quote_type);
 	while (line[*i] && line[*i] != end_quote)
 	{
 		(*i)++;
@@ -80,9 +87,13 @@ void	handle_quotes(t_lexer **lexer, char *line, int *i,
 	}
 	if (!line[*i])
 	{
-		fprintf(stderr, "minishell: unmatched quote\n");
-		return ;
+		printf("minishell:unmatched quote near '%c'\n", token_start[0]);
+		return (0);
 	}
-	process_quotes(lexer, quote_type, flag_space, token_start, j);
+	data.quote_type = quote_ctx.quote_type;
+	data.flag_space = quote_ctx.flag_space;
+	data.token_start = token_start;
+	process_quotes(lexer, &data, j);
 	(*i)++;
+	return (data.quote_type);
 }

@@ -6,25 +6,21 @@
 /*   By: hkhrayza <hkhrayza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/27 11:37:16 by hkhrayza          #+#    #+#             */
-/*   Updated: 2025/01/18 13:35:36 by hkhrayza         ###   ########.fr       */
+/*   Updated: 2025/01/20 17:03:52 by hkhrayza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-int	is_output_redirection(t_lexer *current)
+int	is_herdoc(t_lexer *current)
 {
-	return (!ft_strcmp(current->str, ">"));
-}
-
-int	is_append_redirection(t_lexer *current)
-{
-	return (!ft_strcmp(current->str, ">>"));
-}
-
-int	is_input_redirection(t_lexer *current)
-{
-	return (!ft_strcmp(current->str, "<"));
+	while (current)
+	{
+		if (ft_strcmp(current->str, "<<"))
+			return (1);
+		current = current->next;
+	}
+	return (0);
 }
 
 int	is_invalid_filename(const char *filename)
@@ -39,6 +35,7 @@ int	is_invalid_filename(const char *filename)
 	}
 	return (0);
 }
+
 t_lexer	*process_redirection(t_command *cmd, t_lexer *current,
 		int (*handler)(t_command *), char *type)
 {
@@ -47,7 +44,8 @@ t_lexer	*process_redirection(t_command *cmd, t_lexer *current,
 	file_token = current->next;
 	if (!file_token)
 	{
-		fprintf(stderr, "Syntax error: Missing file after '%s'\n", type);
+		if (ft_strcmp(type, "<<") != 0)
+			fprintf(stderr, "Syntax error: Missing file after '%s'\n", type);
 		return (NULL);
 	}
 	if (is_invalid_filename(file_token->str))
@@ -71,23 +69,15 @@ int	handle_redirections(t_command *cmd, t_cmd *context)
 	while (current)
 	{
 		if (is_output_redirection(current))
-		{
 			current = process_redirection(cmd, current, &handle_output, ">");
-			if (current == NULL)
-				return (1);
-		}
 		else if (is_append_redirection(current))
-		{
 			current = process_redirection(cmd, current, &handle_append, ">>");
-			if (current == NULL)
-				return (1);
-		}
 		else if (is_input_redirection(current))
-		{
 			current = process_redirection(cmd, current, &handle_input, "<");
-			if (current == NULL)
-				return (1);
-		}
+		else if (is_herdoc_redirection(current))
+			current = process_redirection(cmd, current, &herdoo, "<<");
+		if (current == NULL)
+			return (1);
 		current = current->next;
 	}
 	return (0);

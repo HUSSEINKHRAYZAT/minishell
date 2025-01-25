@@ -6,7 +6,7 @@
 /*   By: hkhrayza <hkhrayza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 21:05:18 by hkhrayza          #+#    #+#             */
-/*   Updated: 2025/01/17 11:53:45 by hkhrayza         ###   ########.fr       */
+/*   Updated: 2025/01/24 20:47:42 by hkhrayza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,16 @@ t_lexer	*lexer(char *line, t_cmd *cmd)
 	lexer = NULL;
 	i = 0;
 	ctx.flag_space = 1;
+	ctx.exp = 9;
 	ctx.cmd = cmd;
 	while (line[i])
 	{
 		handle_token(&lexer, line, &i, &ctx);
+		if (ctx.exp == 0)
+		{
+			free_lexer(lexer);
+			return (NULL);
+		}
 	}
 	return (lexer);
 }
@@ -62,8 +68,7 @@ t_lexer	*init_lexer_token(char *str, t_tokens token, t_quote_type quote_type)
 /*
 ** Process Tokens Inside Quotes
 */
-void	process_quotes(t_lexer **lexer, t_quote_type quote_type, int flag_space,
-		char *token_start, int j)
+int	process_quotes(t_lexer **lexer, t_process_data *data, int j)
 {
 	char	*combined_str;
 	char	*new_str;
@@ -72,8 +77,9 @@ void	process_quotes(t_lexer **lexer, t_quote_type quote_type, int flag_space,
 	last_token = *lexer;
 	while (last_token && last_token->next)
 		last_token = last_token->next;
-	new_str = ft_substr(token_start + 1, 0, j);
-	if (last_token && last_token->token == TOKEN_WORD && flag_space == 0)
+	new_str = ft_substr(data->token_start + 1, 0, j);
+	if ((last_token && last_token->token == TOKEN_WORD
+			&& data->flag_space == 0))
 	{
 		combined_str = ft_strjoin(last_token->str, new_str);
 		free(last_token->str);
@@ -81,10 +87,9 @@ void	process_quotes(t_lexer **lexer, t_quote_type quote_type, int flag_space,
 		free(new_str);
 	}
 	else
-	{
 		add_lexer_token(lexer, init_lexer_token(new_str, TOKEN_WORD,
-				quote_type));
-	}
+				data->quote_type));
+	return (0);
 }
 
 /*

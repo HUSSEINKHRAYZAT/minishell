@@ -32,16 +32,16 @@ void	builtin_cd(char **args, t_env *envp)
 
 void	*handle_directory(char *oldpwd)
 {
-	printf("minishell: getcwd failed, ");
-	printf("attempting to move to parent directory (..)");
+	printf("minishell: getcwd failed\n");
+	printf("attempting to move to parent directory (..)\n");
 	if (chdir("..") != 0)
 	{
-		perror("minishell: cd .. failed");
+		perror("minishell: cd .. failed\n");
 		return (oldpwd);
 	}
 	oldpwd = getcwd(NULL, 0);
 	if (!oldpwd)
-		perror("minishell: getcwd after cd ..");
+		perror("minishell: getcwd after cd ..\n");
 	return (oldpwd);
 }
 

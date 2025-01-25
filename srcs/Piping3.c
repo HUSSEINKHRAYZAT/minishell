@@ -1,37 +1,48 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Minishell.c                                        :+:      :+:    :+:   */
+/*   Piping3.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hkhrayza <hkhrayza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/30 11:00:11 by hkhrayza          #+#    #+#             */
-/*   Updated: 2025/01/24 20:43:32 by hkhrayza         ###   ########.fr       */
+/*   Created: 2025/01/20 18:55:30 by hkhrayza          #+#    #+#             */
+/*   Updated: 2025/01/20 19:03:15 by hkhrayza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-t_sig	g_sig;
-
-char	**allocate_args(int count)
+void	close_and_wait(int *pipes, int pipe_count)
 {
-	char	**args;
+	int	i;
 
-	args = malloc((count + 1) * sizeof(char *));
-	if (!args)
-		return (NULL);
-	return (args);
+	i = 0;
+	while (i < pipe_count)
+	{
+		close(pipes[i]);
+		i++;
+	}
+	while (wait(NULL) > 0)
+	{
+	}
+	free(pipes);
 }
 
-int	main(int argc, char **argv, char **envp)
+void	handle_error_and_exit(const char *message)
 {
-	t_cmd	context;
+	perror(message);
+	exit(EXIT_FAILURE);
+}
 
-	(void)argc;
-	(void)argv;
-	initialize_context(&context, envp);
-	handle_user_input(&context);
-	cleanup(&context);
-	return (0);
+int	count_commands(t_command *cmd_list)
+{
+	int	count;
+
+	count = 0;
+	while (cmd_list)
+	{
+		count++;
+		cmd_list = cmd_list->next;
+	}
+	return (count);
 }

@@ -6,7 +6,7 @@
 /*   By: hkhrayza <hkhrayza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 11:41:11 by hkhrayza          #+#    #+#             */
-/*   Updated: 2025/01/04 11:42:36 by hkhrayza         ###   ########.fr       */
+/*   Updated: 2025/01/25 09:39:47 by hkhrayza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,20 +60,21 @@ char	*get_relative_path(char *pwd, char *home)
 	return (pwd);
 }
 
-// Function to get the command path 
+// Function to get the command path
 // (either absolute, relative, or found in PATH)
+// if (args[0][0] == '<')
+// 	exit(127);
 char	*get_command_path(char **args, t_cmd *cmd)
 {
 	char	*cmd_path;
 
 	if (ft_strchr(args[0], '/') != NULL)
 		return (args[0]);
-	cmd_path = find_command_path (args[0], cmd);
-	if (args[0][0] == '<')
-		exit(127);
+	cmd_path = find_command_path(args[0], cmd);
 	if (cmd_path == NULL)
 	{
 		fprintf(stderr, "minishell: %s: command not found\n", args[0]);
+		cmd->last_exit_status = 127;
 		exit(127);
 	}
 	return (cmd_path);

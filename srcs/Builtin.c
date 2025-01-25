@@ -6,7 +6,7 @@
 /*   By: hkhrayza <hkhrayza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 20:39:37 by hkhrayza          #+#    #+#             */
-/*   Updated: 2025/01/03 20:50:49 by hkhrayza         ###   ########.fr       */
+/*   Updated: 2025/01/24 12:05:20 by hkhrayza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ void	builtin_echo(char **args)
 
 	newline = 1;
 	i = 1;
-	while (args[i] && strcmp(args[i], "-n") == 0)
+	while (args[i] && ft_strcmp(args[i], "-n") == 0)
 	{
 		newline = 0;
 		i++;

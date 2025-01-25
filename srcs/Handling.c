@@ -6,7 +6,7 @@
 /*   By: hkhrayza <hkhrayza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 21:12:47 by hkhrayza          #+#    #+#             */
-/*   Updated: 2025/01/17 11:02:42 by hkhrayza         ###   ########.fr       */
+/*   Updated: 2025/01/24 20:42:07 by hkhrayza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 void	handle_pipe(t_lexer **lexer, char *line, int *i)
 {
 	(void)(line);
-	printf("Detected Pipe Token at index %d\n", *i);
 	add_lexer_token(lexer, init_lexer_token(ft_strdup("|"), TOKEN_PIPE,
 			NO_QUOTE));
 	(*i)++;
@@ -27,10 +26,14 @@ void	handle_word(t_lexer **lexer, char *line, int *i, int flag_space)
 
 	new_token = extract_word(line, i);
 	if (flag_space == 1 || *lexer == NULL)
+	{
 		add_lexer_token(lexer, init_lexer_token(new_token, TOKEN_WORD,
 				NO_QUOTE));
+	}
 	else
+	{
 		merge_or_add_token(lexer, new_token);
+	}
 }
 
 char	*extract_word(char *line, int *i)

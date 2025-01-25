@@ -1,37 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Minishell.c                                        :+:      :+:    :+:   */
+/*   Boolredirections.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hkhrayza <hkhrayza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/30 11:00:11 by hkhrayza          #+#    #+#             */
-/*   Updated: 2025/01/24 20:43:32 by hkhrayza         ###   ########.fr       */
+/*   Created: 2025/01/20 16:59:42 by hkhrayza          #+#    #+#             */
+/*   Updated: 2025/01/20 17:04:04 by hkhrayza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-t_sig	g_sig;
-
-char	**allocate_args(int count)
+int	is_output_redirection(t_lexer *current)
 {
-	char	**args;
-
-	args = malloc((count + 1) * sizeof(char *));
-	if (!args)
-		return (NULL);
-	return (args);
+	return (!ft_strcmp(current->str, ">"));
 }
 
-int	main(int argc, char **argv, char **envp)
+int	is_append_redirection(t_lexer *current)
 {
-	t_cmd	context;
+	return (!ft_strcmp(current->str, ">>"));
+}
 
-	(void)argc;
-	(void)argv;
-	initialize_context(&context, envp);
-	handle_user_input(&context);
-	cleanup(&context);
+int	is_input_redirection(t_lexer *current)
+{
+	return (!ft_strcmp(current->str, "<"));
+}
+
+int	herdoo(t_command *cmd)
+{
+	(void)cmd;
 	return (0);
+}
+
+int	is_herdoc_redirection(t_lexer *current)
+{
+	return (!ft_strcmp(current->str, "<<"));
 }

@@ -124,7 +124,7 @@ void	process_input(char *line, t_cmd *context)
 		add_history(trimmed_line);
 	token = lexer(trimmed_line, context);
 	if (!token)
-		return ;
+		return (free(trimmed_line));
 	if (contains_pipes(token))
 		flage = 1;
 	commands = parser(token);

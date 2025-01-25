@@ -6,7 +6,7 @@
 /*   By: hkhrayza <hkhrayza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/17 10:45:48 by hkhrayza          #+#    #+#             */
-/*   Updated: 2025/01/17 11:53:33 by hkhrayza         ###   ########.fr       */
+/*   Updated: 2025/01/25 09:13:52 by hkhrayza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	handle_token(t_lexer **lexer, char *line, int *i, t_context *ctx)
 	if (ft_isspace(line[*i]))
 		handlespace(ctx, i);
 	else if (line[*i] == '\'' || line[*i] == '\"')
-		handlequotetoken(lexer, line, i, ctx);
+		ctx->exp = handlequotetoken(lexer, line, i, ctx);
 	else if (line[*i] == '$')
 		handledollartoken(lexer, line, i, ctx);
 	else if (line[*i] == '>' || line[*i] == '<')
@@ -34,21 +34,34 @@ void	handlespace(t_context *ctx, int *i)
 	(*i)++;
 }
 
-void	handlequotetoken(t_lexer **lexer, char *line, int *i, t_context *ctx)
+int	handlequotetoken(t_lexer **lexer, char *line, int *i, t_context *ctx)
 {
-	int	quoting;
+	t_quote_context	quote_ctx;
 
 	if (line[*i] == '\'')
-		quoting = SINGLE_QUOTES;
+		quote_ctx.quote_type = SINGLE_QUOTES;
 	else
-		quoting = DOUBLE_QUOTES;
-	handle_quotes(lexer, line, i, quoting, ctx->flag_space);
+		quote_ctx.quote_type = DOUBLE_QUOTES;
+	if (line[*i + 1] == '$')
+	{
+		(*i)++;
+		if ((ft_isalpha(line[*i + 1]))
+			&& (quote_ctx.quote_type == DOUBLE_QUOTES))
+		{
+			(*i)++;
+			handle_dollar_variable(lexer, line, i, ctx);
+		}
+		(*i)--;
+	}
+	quote_ctx.flag_space = ctx->flag_space;
+	ctx->exp = handle_quotes(lexer, line, i, quote_ctx);
 	ctx->flag_space = 0;
+	return (ctx->exp);
 }
 
 void	handledollartoken(t_lexer **lexer, char *line, int *i, t_context *ctx)
 {
-	handle_dollar(lexer, line, i, ctx->cmd);
+	handle_dollar(lexer, line, i, ctx);
 	ctx->flag_space = 0;
 }
 

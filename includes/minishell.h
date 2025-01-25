@@ -6,7 +6,7 @@
 /*   By: hkhrayza <hkhrayza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/09 11:31:02 by hkhrayza          #+#    #+#             */
-/*   Updated: 2025/01/18 13:46:35 by hkhrayza         ###   ########.fr       */
+/*   Updated: 2025/01/25 09:13:48 by hkhrayza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,7 @@ typedef struct s_cmd
 typedef struct s_context
 {
 	int					flag_space;
+	int					exp;
 	t_cmd				*cmd;
 }						t_context;
 
@@ -126,6 +127,27 @@ typedef struct s_sig
 	int					exitstatus;
 	int					g_heredoc_interrupted;
 }						t_sig;
+
+typedef struct s_process_data
+{
+	t_quote_type		quote_type;
+	int					flag_space;
+	char				*token_start;
+}						t_process_data;
+
+typedef struct s_quote_context
+{
+	t_quote_type		quote_type;
+	int					flag_space;
+}						t_quote_context;
+
+typedef struct s__pip
+{
+	t_command			*cmd;
+	t_cmd				*context;
+	int					*pipes;
+	int					pipe_count;
+}						t_pip;
 
 extern t_sig			g_sig;
 
@@ -160,7 +182,7 @@ void					print_commands(t_command *cmd_list);
 void					print_lexerr(t_lexer *lexer);
 void					print_parser(t_command *parser);
 void					print_welcome_message(void);
-void					print_Array(char **cmd);
+void					print_array(char **cmd);
 void					print_command(t_command *command);
 int						handle_append(t_command *cmd);
 int						handle_output(t_command *cmd);
@@ -175,6 +197,7 @@ int						contains_heredoc(t_lexer *token);
 int						contains_redirection(t_lexer *tokens);
 int						contains_pipes(t_lexer *token);
 int						is_directory(char *path);
+void					handle_digits(t_lexer **lexer, char *line, int *i);
 
 /* Builtin functions */
 
@@ -182,7 +205,7 @@ void					builtin_unset(char **args, t_env **envp);
 void					builtin_env(t_env *envp);
 void					builtin_echo(char **args);
 void					builtin_pwd(void);
-void					builtin_exit(t_command *cmd);
+void					builtin_exit(t_command *cmd, t_cmd *context);
 void					builtin_export(char **args, t_env *envp);
 void					builtin_cd(char **args, t_env *envp);
 int						is_builtin(char *cmd);
@@ -199,6 +222,8 @@ void					execute_external_command(char **args, t_cmd *cmd);
 void					remove_redirection_tokens(t_lexer **tokens,
 							t_lexer *redirection, t_lexer *file_token);
 void					restore_fds(int *backup_fds);
+void					remove_token(t_lexer **tokens,
+							t_lexer *token_to_remove);
 int						handle_flag_or_heredoc(t_command *cmd, t_cmd *context,
 							int flage, int *backup_fds);
 
@@ -245,8 +270,8 @@ t_lexer					*lexer(char *line, t_cmd *cmd);
 t_lexer					*init_lexer_token(char *str, t_tokens token,
 							t_quote_type quote_type);
 void					add_lexer_token(t_lexer **lexer, t_lexer *new_token);
-void					process_quotes(t_lexer **lexer, t_quote_type quote_type,
-							int flag_space, char *token_start, int j);
+int						process_quotes(t_lexer **lexer, t_process_data *data,
+							int j);
 
 /* Main functions */
 
@@ -264,17 +289,17 @@ char					*read_input(t_cmd *context);
 void					handle_user_input(t_cmd *context);
 void					handle_pipe(t_lexer **lexer, char *line, int *i);
 void					handle_dollar(t_lexer **lexer, char *line, int *i,
-							t_cmd *cmd);
+							t_context *ctx);
 void					handle_redirection_token(t_lexer **lexer, char *line,
 							int *i);
 void					handle_word(t_lexer **lexer, char *line, int *i,
 							int flag_space);
-void					handle_quotes(t_lexer **lexer, char *line, int *i,
-							t_quote_type quote_type, int flag_space);
+int						handle_quotes(t_lexer **lexer, char *line, int *i,
+							t_quote_context quote_ctx);
 void					handle_token(t_lexer **lexer, char *line, int *i,
 							t_context *ctx);
 
-void					handle_heredocs(t_command *cmd, char ***temp_filenames,
+int						handle_heredocs(t_command *cmd, char ***temp_filenames,
 							int *temp_file_count);
 int						handle_redirections(t_command *cmd, t_cmd *context);
 void					*handle_directory(char *oldpwd);
@@ -303,13 +328,13 @@ void					handle_dollar_pid(t_lexer **lexer, int *i);
 void					handle_dollar_exit_status(t_lexer **lexer, int *i,
 							t_cmd *cmd);
 void					handle_dollar_variable(t_lexer **lexer, char *line,
-							int *i, t_cmd *cmd);
+							int *i, t_context *ctx);
 /*Handling3*/
 
 char					*extract_word(char *line, int *i);
 void					merge_or_add_token(t_lexer **lexer, char *new_token);
 void					handlespace(t_context *ctx, int *i);
-void					handlequotetoken(t_lexer **lexer, char *line, int *i,
+int						handlequotetoken(t_lexer **lexer, char *line, int *i,
 							t_context *ctx);
 void					handledollartoken(t_lexer **lexer, char *line, int *i,
 							t_context *ctx);
@@ -319,6 +344,17 @@ void					handlepipetoken(t_lexer **lexer, char *line, int *i,
 							t_context *ctx);
 void					handlewordtoken(t_lexer **lexer, char *line, int *i,
 							t_context *ctx);
+/* boolredirection*/
+
+int						is_invalid_filename(const char *filename);
+int						is_herdoc(t_lexer *current);
+int						is_output_redirection(t_lexer *current);
+int						is_append_redirection(t_lexer *current);
+int						is_input_redirection(t_lexer *current);
+int						herdoo(t_command *cmd);
+int						is_herdoc_redirection(t_lexer *current);
+int						is_herdoc(t_lexer *current);
+
 /* Utility functions */
 
 char					**allocate_args(int count);
@@ -327,6 +363,25 @@ void					execute_command_with_heredoc(t_command *cmd,
 							t_cmd *context);
 pid_t					ft_getpid(void);
 int						count_tokens(t_lexer *tokens);
-int						is_invalid_filename(const char *filename);
+
+void					process_heredoc_input(int temp_fd, char *buffer,
+							char *delimiter);
+void					handle_env_variable(int temp_fd, char *buffer);
+void					process_heredoc(int temp_fd, char *delimiter);
+int						handle_single_heredoc(t_lexer **tokens,
+							char ***temp_filenames, int *temp_file_count);
+void					redirect_temp_files(char **temp_filenames,
+							int temp_file_count);
+void					cleanup_temp_files(char **temp_filenames,
+							int temp_file_count);
+int						handle_heredoc_error(t_lexer **tokens, char *message,
+							int move_next);
+int						create_temp_file(char *filename);
+void					store_temp_filename(char ***temp_filenames,
+							int *temp_file_count, char *filename);
+void					remove_heredoc_tokens(t_command *cmd);
+void					close_and_wait(int *pipes, int pipe_count);
+void					handle_error_and_exit(const char *message);
+int						count_commands(t_command *cmd_list);
 
 #endif

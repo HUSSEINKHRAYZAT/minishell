@@ -6,7 +6,7 @@
 /*   By: hkhrayza <hkhrayza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 20:45:28 by hkhrayza          #+#    #+#             */
-/*   Updated: 2025/01/15 15:48:16 by hkhrayza         ###   ########.fr       */
+/*   Updated: 2025/01/20 16:00:40 by hkhrayza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,9 @@ int	is_directory(char *path)
 	return (0);
 }
 
+// if (ft_strcmp(tokens->str, "<<") == 0)
+// 	return (1);
+
 int	contains_redirection(t_lexer *tokens)
 {
 	while (tokens)
@@ -34,8 +37,6 @@ int	contains_redirection(t_lexer *tokens)
 		if (ft_strcmp(tokens->str, ">") == 0)
 			return (1);
 		if (ft_strcmp(tokens->str, ">>") == 0)
-			return (1);
-		if (ft_strcmp(tokens->str, "<<") == 0)
 			return (1);
 		tokens = tokens->next;
 	}
@@ -49,23 +50,23 @@ int	is_builtin(char *cmd)
 		|| !ft_strcmp(cmd, "env") || !ft_strcmp(cmd, "exit"));
 }
 
-void	builtin_exit(t_command *cmd)
+void	builtin_exit(t_command *cmd, t_cmd *context)
 {
 	char	**args;
-	int		exit_code;
 
+	context->last_exit_status = 0;
 	args = lexer_to_args(cmd->tokens);
 	if (args)
 	{
 		if (args[1])
 		{
-			exit_code = atoi(args[1]);
+			context->last_exit_status = atoi(args[1]);
 			free_array(args);
-			exit(exit_code);
+			exit(context->last_exit_status);
 		}
 		free_array(args);
 	}
-	exit(0);
+	exit(context->last_exit_status);
 }
 
 /* Function to read input and manage prompt generation */

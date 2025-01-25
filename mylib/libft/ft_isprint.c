@@ -1,37 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Minishell.c                                        :+:      :+:    :+:   */
+/*   ft_isprint.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hkhrayza <hkhrayza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/30 11:00:11 by hkhrayza          #+#    #+#             */
-/*   Updated: 2025/01/24 20:43:32 by hkhrayza         ###   ########.fr       */
+/*   Created: 2024/07/14 14:34:38 by hkhrayza          #+#    #+#             */
+/*   Updated: 2024/07/14 14:34:39 by hkhrayza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/minishell.h"
+#include "libft.h"
 
-t_sig	g_sig;
-
-char	**allocate_args(int count)
+int	ft_isprint(int c)
 {
-	char	**args;
-
-	args = malloc((count + 1) * sizeof(char *));
-	if (!args)
-		return (NULL);
-	return (args);
-}
-
-int	main(int argc, char **argv, char **envp)
-{
-	t_cmd	context;
-
-	(void)argc;
-	(void)argv;
-	initialize_context(&context, envp);
-	handle_user_input(&context);
-	cleanup(&context);
+	if (c >= 32 && c <= 126)
+		return (1);
 	return (0);
 }

@@ -35,5 +35,24 @@ char	*ft_strjoin_three(char const *s1, char const *s2, char const *s3)
 
 pid_t	ft_getpid(void)
 {
-	return (syscall(SYS_getpid));
+	int		fd;
+	char	buffer[256];
+	ssize_t	bytes_read;
+	int		i;
+	pid_t	pid;
+
+	i = 0;
+	fd = open("/proc/self/stat", O_RDONLY);
+	if (fd < 0)
+		return (-1);
+	bytes_read = read(fd, buffer, sizeof(buffer) - 1);
+	close(fd);
+	if (bytes_read <= 0)
+		return (-1);
+	buffer[bytes_read] = '\0';
+	while (buffer[i] >= '0' && buffer[i] <= '9')
+		i++;
+	buffer[i] = '\0';
+	pid = (pid_t)ft_atoi(buffer);
+	return (pid);
 }

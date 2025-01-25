@@ -32,7 +32,7 @@ void	execute_builtin_command(t_command *cmd, t_cmd *context)
 	else if (!ft_strcmp(args[0], "env"))
 		builtin_env(context->envp);
 	else if (!ft_strcmp(args[0], "exit"))
-		builtin_exit(cmd);
+		builtin_exit(cmd, context);
 	free_array(args);
 }
 
@@ -81,17 +81,25 @@ void	execute_external_command(char **args, t_cmd *cmd)
 {
 	pid_t	pid;
 	char	*cmd_path;
+	int		status;
 
 	if (is_directory(args[0]))
+	{
+		cmd->last_exit_status = 126;
 		return ;
+	}
 	pid = fork();
 	if (pid == 0)
 	{
 		cmd_path = get_command_path(args, cmd);
 		exec_command(cmd_path, args, cmd);
+		cmd->last_exit_status = 0;
 	}
 	else if (pid > 0)
-		wait(NULL);
+	{
+		waitpid(pid, &status, 0);
+		cmd->last_exit_status = status >> 8;
+	}
 	else
 		perror("fork");
 }
@@ -104,6 +112,7 @@ int	execution(t_command *cmd, t_cmd *context)
 	if (is_builtin(cmd->tokens->str))
 	{
 		execute_builtin_command(cmd, context);
+		context->last_exit_status = 0;
 	}
 	else
 	{

@@ -1,37 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Minishell.c                                        :+:      :+:    :+:   */
+/*   ft_lstnew_bonus.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hkhrayza <hkhrayza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/30 11:00:11 by hkhrayza          #+#    #+#             */
-/*   Updated: 2025/01/24 20:43:32 by hkhrayza         ###   ########.fr       */
+/*   Created: 2024/08/29 23:05:49 by hkhrayza          #+#    #+#             */
+/*   Updated: 2024/08/29 23:05:49 by hkhrayza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/minishell.h"
+#include "libft.h"
 
-t_sig	g_sig;
-
-char	**allocate_args(int count)
+t_list	*ft_lstnew(void *content)
 {
-	char	**args;
+	t_list	*new_node;
 
-	args = malloc((count + 1) * sizeof(char *));
-	if (!args)
+	new_node = (t_list *)malloc(sizeof(t_list));
+	if (! new_node)
 		return (NULL);
-	return (args);
-}
-
-int	main(int argc, char **argv, char **envp)
-{
-	t_cmd	context;
-
-	(void)argc;
-	(void)argv;
-	initialize_context(&context, envp);
-	handle_user_input(&context);
-	cleanup(&context);
-	return (0);
+	new_node->content = content;
+	new_node->next = NULL;
+	return (new_node);
 }

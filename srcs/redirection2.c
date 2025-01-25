@@ -6,14 +6,13 @@
 /*   By: hkhrayza <hkhrayza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/17 13:00:01 by hkhrayza          #+#    #+#             */
-/*   Updated: 2025/01/17 13:43:37 by hkhrayza         ###   ########.fr       */
+/*   Updated: 2025/01/20 15:56:19 by hkhrayza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-void	remove_redirection_tokens(t_lexer **tokens, t_lexer *redirection,
-		t_lexer *file_token)
+void	remove_token(t_lexer **tokens, t_lexer *token_to_remove)
 {
 	t_lexer	*current;
 	t_lexer	*prev;
@@ -23,25 +22,27 @@ void	remove_redirection_tokens(t_lexer **tokens, t_lexer *redirection,
 	prev = NULL;
 	while (current)
 	{
-		if (current == redirection || current == file_token)
+		if (current == token_to_remove)
 		{
 			to_free = current;
 			if (prev)
 				prev->next = current->next;
 			else
 				*tokens = current->next;
-			current = current->next;
 			free(to_free->str);
 			free(to_free);
-			if (to_free == file_token)
-				break ;
+			return ;
 		}
-		else
-		{
-			prev = current;
-			current = current->next;
-		}
+		prev = current;
+		current = current->next;
 	}
+}
+
+void	remove_redirection_tokens(t_lexer **tokens, t_lexer *redirection,
+		t_lexer *file_token)
+{
+	remove_token(tokens, redirection);
+	remove_token(tokens, file_token);
 }
 
 int	handle_append(t_command *cmd)

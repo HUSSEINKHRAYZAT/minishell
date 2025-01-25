@@ -24,7 +24,9 @@ srcs/MainFunctions.c srcs/LexerFunctions.c srcs/herdocs.c srcs/Handling.c srcs/G
 srcs/ExecutionFunctions.c srcs/EnvFunctions.c srcs/Piping.c srcs/Cleaningfunctions.c srcs/Changedirectory.c  \
 srcs/signal.c srcs/Parser.c srcs/Getting2.c srcs/Handling2.c srcs/Env2.c srcs/Env3.c srcs/Cleaning2.c \
 srcs/Utilities.c srcs/Utilities2.c srcs/Execution2.c srcs/Handling3.c srcs/Handling4.c srcs/Handling5.c \
-srcs/Parser2.c srcs/Piping2.c srcs/redirection2.c srcs/signalheredoc.c
+srcs/Parser2.c srcs/Piping2.c srcs/redirection2.c srcs/signalheredoc.c srcs/Printing2.c srcs/Boolredirections.c \
+srcs/here1.c srcs/here2.c srcs/Piping3.c
+
 OBJS = $(SRCS:.c=.o)
 
 # Rules
