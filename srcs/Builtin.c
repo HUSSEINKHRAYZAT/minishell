@@ -6,7 +6,7 @@
 /*   By: hkhrayza <hkhrayza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 20:39:37 by hkhrayza          #+#    #+#             */
-/*   Updated: 2025/01/24 12:05:20 by hkhrayza         ###   ########.fr       */
+/*   Updated: 2025/01/28 14:28:09 by hkhrayza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ void	builtin_export(char **args, t_env *envp)
 	i = 1;
 	while (args[i])
 	{
+                    printf("%s", args[i]);
 		process_export_argument(args[i], envp);
 		i++;
 	}
